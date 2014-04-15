@@ -7,33 +7,26 @@
 #include "draw.h"
 #include "block.h"
 #include "cellular_automaton.h"
-/*char *usage =
-  "Usage: %s -d spline-file [-p points-file] [ -g gnuplot-file [-f from_x -t to_x -n n_points ] ]\n"
-  "            if points-file is given then\n"
-  "               reads discrete 2D points from points-file\n"
-  "               writes spline approximation to spline-file\n"
-  "               - number of points should be >= 4\n"
-  "            else (points-file not given)\n"
-  "               reads spline from spline-file\n"
-  "            endfi\n"
-  "            if gnuplot-file is given then\n"
-  "               makes table of n_points within <from_x,to_x> range\n"
-  "               - from_x defaults to x-coordinate of the first point in points-file,\n"
-  "               - to_x defaults to x-coordinate of the last point\n"
-  "               - n_points defaults to 100\n"
-  "               - n_points must be > 1\n"
-  "            endif\n";*/
-				
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/types.h>
+
+#define PARENT_DIRECTORY  ".."
+
+char *usage =
+  "Usage: %s -d data -f format -n number of generation -r directory name -i frequency";
+
 int main (int argc, char **argv){
 	matrix_t *m;
 	matrix_t *newm;
 	int opt;
+	char *progname = argv[0];
 	char *inf = NULL;
         char *format = NULL;
-	char *progname = argv[0];
 	int n = 20;
-	printf("w main");
- 	while ((opt = getopt (argc, argv, "d:f:n:")) != -1) {
+	char *dirname = NULL;
+	int f=1;
+ 	while ((opt = getopt (argc, argv, "d:f:n:r:i:")) != -1) {
     		switch (opt) {
     			case 'd':
     				inf = optarg;
@@ -44,8 +37,14 @@ int main (int argc, char **argv){
 			case 'n':
 				n=atoi(optarg);
 			break;
+			case 'r':
+				dirname=optarg;
+			break;
+			case 'i':
+				f=atoi(optarg);
+			break;
 			default:    
-		/*		fprintf(stderr, usage, progname);*/               
+				fprintf(stderr, usage, progname);          
       				exit (EXIT_FAILURE);
 		}
 	}
@@ -54,7 +53,7 @@ int main (int argc, char **argv){
 		for( ; optind < argc; optind++ )
 			fprintf( stderr, "\t\"%s\"\n", argv[optind] );
 		fprintf( stderr, "\n" );
-	/*	fprintf( stderr, usage, progname );*/
+		fprintf( stderr, usage, progname );
 		exit( EXIT_FAILURE );
 	}
 	if (inf != NULL) {
@@ -66,28 +65,31 @@ int main (int argc, char **argv){
 		else 
 			m=read_matrix(in);
 	}
-//	if (format==NULL)
-//		strcat(format," bmp");
-	/*else {};*/
+	else{
+		FILE *in = fopen("samolot","r");
+		m=read_matrix(in);
+	}
 	
-	write_matrix(m, stdout);
+	if (format == NULL)
+	format="bmp";
+	
+	if(dirname==NULL) dirname="pictures";
+	
 	int i=0;
-
+	int k=1;
 	for(i;i<n;i++){
-	char name[100]="";
-
-char str[10];
-printf("przed sprintf\n");
-sprintf(str, "%d", i+1);
-printf("po sprintf\n");
+		if(i%f==0){
+		char name[100]="";
+		char str[10];
+		sprintf(str, "%d", k);
 		strcpy(name,"picture");
-		printf("po strcpy\n");
-		strcat(name,str);		
-				strcat(name,".bmp");
-		write_matrix(m,stdout);	
-		draw_matrix(m,name);
-		
-	        newm = cellular_automaton(m);
+		strcat(name,str);
+		strcat(name,".");
+		strcat(name,format);	
+		draw_matrix(m,name,dirname);
+		k++;
+		}
+		newm = cellular_automaton(m);
 		m=newm;
 	}
 

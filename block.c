@@ -8,28 +8,25 @@ void block(int r, int c, matrix_t *m, int tab[] ){
 	int x = 0;
 	int y = 0; 
 	int k,l;
-	printf("aktualnie sprawdzana komórka %d %d \n",r,c);
+
 	int tmp=1;
 		for(k=-1;k<2;k++)
 			for(l=-1;l<2;l++)
 			{
 				x=(r+k)%m->rn;
 				y=(c+l)%m->cn;
+
 				if (x==0)	x=m->rn;
 				if (y==0)	y=m->cn;
-				printf("nr = %d nc = %d tmp = %d n\n",x, y,tmp);
+				
 				if(x!=r||y!=c){
-					tab[tmp]=m->e[(x-1)*m->cn+y-1];
-					printf("wartosc e %d\n",m->e[(x-1)*m->cn+y-1]);
+					tab[tmp]=m->e[(x-1)*m->cn+y-1];	
 					tmp++;
 				}	
-			}		
-	int i=0;
-	for(i;i<tab[0];i++)
-	printf("%d",tab[i]);
-	printf("\n");
+			}			
 
 }
+
 int cellular( int tab[], int status){
 	int nl=0;
 	int nd=0;

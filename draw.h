@@ -5,7 +5,7 @@
 #include<stdlib.h>
 #include"matrix.h"
 #include "allegro.h"
-void draw_matrix(matrix_t *m,char *name);
+void draw_matrix(matrix_t *m,char *name,char *dirname);
 
 #endif
 
