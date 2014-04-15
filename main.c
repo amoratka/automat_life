@@ -66,7 +66,7 @@ int main (int argc, char **argv){
 			m=read_matrix(in);
 	}
 	else{
-		FILE *in = fopen("samolot","r");
+		FILE *in = fopen("pulsar","r");
 		m=read_matrix(in);
 	}
 	
